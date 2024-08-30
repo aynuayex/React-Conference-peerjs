@@ -7,6 +7,7 @@ import { peersReducer } from "./peerReducer";
 import { addPeerAction, removePeerAction } from "./peerActions";
 
 const server = "https://react-conference-peerjs.onrender.com";
+// const server = "http://localhost:8080";
 const ws = socketIO(server);
 
 export const RoomContext = createContext<any | null>(null);
