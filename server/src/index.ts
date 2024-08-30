@@ -1,13 +1,14 @@
-import express from "express"
-import http from 'http'
-import {Server} from "socket.io"
+import 'dotenv/config';
+import express from "express";
+import http from 'http';
+import {Server} from "socket.io";
 // import cors, { CorsOptions }  from "cors";
 import { roomHandler } from "./room";
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 const app = express();
 
-// const whitelist = ["http://localhost:5173", "http://192.168.8.3:5173"]
+// const whitelist = ["http://localhost:5173", "http://192.168.8.3:5173", "https://react-conference-peerjs.netlify.app"]
 // const corsOptions: CorsOptions = {
 //     origin: function (origin, callback) {
 //       if (origin && whitelist.indexOf(origin) !== -1) {
@@ -16,14 +17,14 @@ const app = express();
 //         callback(new Error('Not allowed by CORS'))
 //       }
 //     },
-//     optionsSuccessStatus: 200 
+//     optionsSuccessStatus: 200
 //   }
 // app.use(cors(corsOptions));
 
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "http://192.168.8.3:5173"],
+        origin: ["http://localhost:5173", "http://192.168.8.3:5173", "https://react-conference-peerjs.netlify.app"],
         methods: ["GET", "POST"]
     }
 })

@@ -6,7 +6,7 @@ import { v4 as uuidV4 } from "uuid";
 import { peersReducer } from "./peerReducer";
 import { addPeerAction, removePeerAction } from "./peerActions";
 
-const server = "http://localhost:8080";
+const server = "https://react-conference-peerjs.onrender.com";
 const ws = socketIO(server);
 
 export const RoomContext = createContext<any | null>(null);
