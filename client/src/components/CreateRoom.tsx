@@ -1,23 +1,25 @@
-import { useContext, useState } from "react";
-import { RoomContext } from "../context/RoomContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import NameInput from "../common/Name";
+import Button from "./commom/Button";
+import { ws } from "../ws";
 
 const CreateRoom = () => {
   const [roomId, setRoomId] = useState("");
   const navigate = useNavigate();
-  const { ws } = useContext(RoomContext);
   const createRoom = () => {
     ws.emit("create-room");
   };
 
   return (
     <div className="flex flex-col gap-2">
+      <NameInput />
       <div className="flex gap-2">
         <input
           type="text"
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
-          className="rounded border border-black outline-1 bg-gray-200 focus:bg-gray-100"
+          className="p-2 rounded border border-black outline-1 bg-gray-200 focus:bg-gray-100"
         />
         <button
           onClick={() => navigate(`room/${roomId}`)}
@@ -26,12 +28,12 @@ const CreateRoom = () => {
           Join a meeting
         </button>
       </div>
-      <button
+      <Button
         onClick={createRoom}
-        className="bg-rose-400 py-2 px-8 rounded-lg text-xl hover:bg-rose-600 text-white"
+        className="py-2 px-8 text-xl"
       >
         Start new meeting
-      </button>
+      </Button>
     </div>
   );
 };

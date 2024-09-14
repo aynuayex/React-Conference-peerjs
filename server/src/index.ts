@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
     roomHandler(socket);
 
     socket.on("disconnect", () => {
-        console.log("user is disconnected!")
+        console.log("user is disconnected!");
     })
 })
 
