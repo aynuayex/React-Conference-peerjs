@@ -43,11 +43,6 @@ export const roomHandler = (socket: Socket) => {
     rooms[roomId][peerId] = {peerId, userName};
     socket.to(roomId).emit("user-joined",{ peerId, userName});
     console.log("user joined a room!", roomId, peerId, userName);
-    // should emit to the room only, so use .to(roomId)
-    socket.to(roomId).emit("get-users", {
-      roomId,
-      participants: rooms[roomId],
-    });
 
     socket.on("disconnect", () => {
       console.log("user left the room!", peerId);
