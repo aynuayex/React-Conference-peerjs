@@ -49,7 +49,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
   const connectionsRef = useRef<Record<string, MediaConnection[]>>({});
   // const { userName, userId } = useContext(UserContext);
   const [userName, setUserName] = useState(
-    localStorage.getItem("userName") || ""
+    sessionStorage.getItem("userName") || ""
   );
   const [stream, setStream] = useState<MediaStream>();
   const [screenSharingId, setScreenSharingId] = useState<string>("");
@@ -163,10 +163,10 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const savedId = localStorage.getItem("userId");
+    const savedId = sessionStorage.getItem("userId");
     const userId = savedId || uuidV4();
 
-    localStorage.setItem("userId", userId);
+    sessionStorage.setItem("userId", userId);
     const peer = new Peer(userId, {
       // host: "localhost",
       // port: 9000,

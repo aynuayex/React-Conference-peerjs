@@ -9,7 +9,7 @@ const NameInput = () => {
   // const { userName, setUserName } = useContext(UserContext);
 
   useEffect(() => {
-    localStorage.setItem("userName", userName);
+    sessionStorage.setItem("userName", userName);
   }, [userName]);
 
   useEffect(() => {
