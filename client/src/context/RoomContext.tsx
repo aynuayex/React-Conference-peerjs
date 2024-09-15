@@ -224,7 +224,8 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
     });
     peer.on("disconnected", () => peer.reconnect());
     peer.on("call", (call) => {
-      const { userName: remoteName } = call.metadata;
+      const { userName: callerName } = call.metadata;
+      dispatch(addPeerNameAction(call.peer, callerName));
       if (call) {
         // Store the connection
         if (!connectionsRef.current[call.peer]) {
@@ -232,7 +233,6 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         }
         connectionsRef.current[call.peer].push(call);
         if (stream) {
-          dispatch(addPeerNameAction(call.peer, remoteName));
           call.answer(stream);
           call.on("stream", (peerStream) => {
             console.log("Received stream from peer:", call.peer);
@@ -244,7 +244,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
             .getUserMedia({ video: true, audio: true })
             .then((stream) => {
               setStream(stream);
-              dispatch(addPeerNameAction(call.peer, remoteName));
+              // dispatch(addPeerNameAction(call.peer, callerName));
 
               call.answer(stream);
               call.on("stream", (peerStream) => {
@@ -331,7 +331,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
 
     function attemptCall(
       peerId: string,
-      remoteName: string,
+      joinedName: string,
       stream: MediaStream,
       retries = 3
     ) {
@@ -339,7 +339,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Failed to connect to peer after multiple attempts.");
         return;
       }
-      dispatch(addPeerNameAction(peerId, remoteName));
+      dispatch(addPeerNameAction(peerId, joinedName));
       const call = meRef.current?.call(peerId, stream, {
         metadata: { userName },
       });
@@ -372,22 +372,22 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         if (err.type === "peer-unavailable") {
           console.log("Retrying call...");
           setTimeout(
-            () => attemptCall(peerId, remoteName, stream, retries - 1),
+            () => attemptCall(peerId, joinedName, stream, retries - 1),
             1000
           ); // Retry after 1 second
         }
       });
     }
 
-    ws.on("user-joined", ({ peerId, userName: remoteName }) => {
+    ws.on("user-joined", ({ peerId, userName }) => {
       console.log("User joined a room!", peerId);
-      attemptCall(peerId, remoteName, stream);
+      attemptCall(peerId, userName, stream);
     });
 
     return () => {
       ws.off("user-joined");
     };
-  }, [meRef.current, stream]);
+  }, [meRef.current, stream, userName]);
 
   console.log({ peers });
 
