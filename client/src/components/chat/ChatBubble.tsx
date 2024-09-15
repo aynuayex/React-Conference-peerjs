@@ -15,7 +15,7 @@ const ChatBubble: React.FC<{ message: IMessage }> = ({ message }) => {
 
   const time = new Date(message.timestamp).toLocaleTimeString();
   return (
-    <div
+    <div 
       className={classNames("m-2 flex", {
         "pl-10 justify-end": isSelf,
         "pr-10 justify-start": !isSelf,

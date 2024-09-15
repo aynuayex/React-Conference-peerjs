@@ -1,5 +1,3 @@
-import { User } from "../type/user";
-
 export const ADD_PEER_STREAM = "ADD_PEER_STREAM" as const;
 export const ADD_PEER_NAME = "ADD_PEER_NAME" as const;
 export const REMOVE_PEER_STREAM = "REMOVE_PEER_STREAM" as const;
@@ -10,7 +8,6 @@ export const addPeerStreamAction = (peerId: string, stream: MediaStream) => ({
   payload: { peerId, stream },
 });
 
-// below both can use the User type
 export const addPeerNameAction = (peerId: string, userName: string) => ({
   type: ADD_PEER_NAME,
   payload: { peerId, userName },
@@ -19,9 +16,4 @@ export const addPeerNameAction = (peerId: string, userName: string) => ({
 export const removePeerStreamAction = (peerId: string) => ({
   type: REMOVE_PEER_STREAM,
   payload: { peerId },
-});
-
-export const addAllPeersAction = (peers: Record<string, User>) => ({
-  type: ADD_ALL_PEERS,
-  payload: { peers },
 });

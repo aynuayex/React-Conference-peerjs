@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { ws } from "../ws";
 import { peersReducer } from "../reducers/peerReducer";
 import {
-  addAllPeersAction,
   addPeerNameAction,
   addPeerStreamAction,
   removePeerStreamAction,
@@ -49,7 +48,9 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
   const meRef = useRef<Peer>();
   const connectionsRef = useRef<Record<string, MediaConnection[]>>({});
   // const { userName, userId } = useContext(UserContext);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState(
+    localStorage.getItem("userName") || ""
+  );
   const [stream, setStream] = useState<MediaStream>();
   const [screenSharingId, setScreenSharingId] = useState<string>("");
   const [roomId, setRoomId] = useState<string>("");
@@ -60,20 +61,8 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
     navigate(`/room/${roomId}`);
   };
 
-  const getUsers = ({
-    roomId,
-    participants,
-  }: {
-    roomId: string;
-    // participants: string[];
-    participants: Record<string, User>;
-  }) => {
-    console.log({ roomId, participants });
-    dispatch(addAllPeersAction(participants));
-  };
-
   const removePeer = (peerId: string) => {
-  // Close all connections to this peer
+    // Close all connections to this peer
     if (connectionsRef.current[peerId]) {
       connectionsRef.current[peerId].forEach((conn) => conn.close());
       delete connectionsRef.current[peerId];
@@ -132,33 +121,6 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  // const switchStream = (stream: MediaStream, id: string) => {
-  //   setStream(stream);
-  //   setScreenSharingId(id);
-  //   Object.values(me?.connections).forEach((connection: any) => {
-  //     const videoTrack = stream
-  //       ?.getTracks()
-  //       .find((track) => track.kind === "video");
-  //     console.log({ connection });
-  //     connection[0].peerConnection
-  //       .getSenders()[1]
-  //       .replaceTrack(videoTrack)
-  //       .catch((err: any) => console.log(err));
-  //   });
-  // };
-
-  // const shareScreen = () => {
-  //   if (screenSharingId) {
-  //     navigator.mediaDevices
-  //       .getUserMedia({ video: true, audio: true })
-  //       .then((stream) => switchStream(stream, ""));
-  //   } else {
-  //     navigator.mediaDevices
-  //       .getDisplayMedia({})
-  //       .then((stream) => switchStream(stream, userId || ""));
-  //   }
-  // };
-
   const shareScreen = () => {
     if (screenSharingId) {
       navigator.mediaDevices
@@ -201,19 +163,19 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const userId = uuidV4();
+    const savedId = localStorage.getItem("userId");
+    const userId = savedId || uuidV4();
 
-    const peer = new Peer(
-    userId,
-     {
+    localStorage.setItem("userId", userId);
+    const peer = new Peer(userId, {
       // host: "localhost",
       // port: 9000,
       // path: "/myapp",
-    }
-    );
+    });
     meRef.current = peer;
     // console.log(peer);
     // peer && setMe(peer);
+
     // Register event handlers for the peer
     peer.on("open", () => {
       console.log("Peer connection is open with ID:", peer.id);
@@ -222,7 +184,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
     peer.on("error", (err) => {
       console.error({ err });
     });
-    peer.on("disconnected", () => peer.reconnect());
+    // peer.on("disconnected", () => peer.reconnect());
     peer.on("call", (call) => {
       const { userName: callerName } = call.metadata;
       dispatch(addPeerNameAction(call.peer, callerName));
@@ -269,15 +231,14 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Error accessing media devices.", err);
       });
     ws.on("room-created", enterRoom);
-    ws.on("get-users", getUsers);
     ws.on("user-disconnected", removePeer);
     ws.on("user-started-sharing", (peerId) => setScreenSharingId(peerId));
     ws.on("user-stopped-sharing", () => setScreenSharingId(""));
     ws.on("name-changed", nameChangedHandler);
 
     return () => {
+      peer.destroy(); // Ensures that any old peer with the same ID is destoryed before we try to connect with it again.
       ws.off("room-created");
-      ws.off("get-users");
       ws.off("user-disconnected");
       ws.off("user-started-sharing");
       ws.off("user-stopped-sharing");
@@ -293,57 +254,27 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [screenSharingId, roomId]);
 
-  // useEffect(() => {
-  //   console.log({ me, stream });
-  //   if (!me || !stream) return;
-  //   ws.on("user-joined", ({ peerId, userName: name }) => {
-  //     dispatch(addPeerNameAction(peerId, name));
-  //     console.log("user joined a room!", peerId, name);
-  //     // me.on("open", () => {
-  //     setTimeout(() => {
-  //       const call = me.call(peerId, stream, {
-  //         metadata: { userName },
-  //       });
-  //       call.on("stream", (peerStream) => {
-  //         console.log("hi inside");
-  //         dispatch(addPeerStreamAction(peerId, peerStream));
-  //       });
-  //       call.on("error", (err: any) => console.error({ err }));
-  //     }, 1000);
-  //     // })
-  //   });
-  //   // me.on("open", () => {
-
-  //   me.on("call", (call) => {
-  //     const { userName } = call.metadata;
-  //     dispatch(addPeerNameAction(call.peer, userName));
-  //     call.answer(stream);
-  //     call.on("stream", (peerStream) => {
-  //       dispatch(addPeerStreamAction(call.peer, peerStream));
-  //     });
-  //   });
-  //   me.on("disconnected", () => me.reconnect());
-  //   // })
-  // }, [me, stream, userName]);
-
   useEffect(() => {
     if (!meRef.current || !stream) return;
-
+    
+    dispatch(addPeerNameAction(meRef.current.id, userName));
+    let retrying = true; 
     function attemptCall(
       peerId: string,
       joinedName: string,
       stream: MediaStream,
-      retries = 3
+      retries: number
     ) {
       if (retries <= 0) {
         console.error("Failed to connect to peer after multiple attempts.");
+        retrying = false; 
         return;
       }
+
       dispatch(addPeerNameAction(peerId, joinedName));
       const call = meRef.current?.call(peerId, stream, {
         metadata: { userName },
       });
-
       if (call) {
         // Store the connection
         if (!connectionsRef.current[peerId]) {
@@ -367,25 +298,32 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         call.on("error", (err) => console.log("Call error with peer:", err));
       }
 
-      meRef.current?.on("error", (err) => {
-        console.error("Error while calling peer:", err);
-        if (err.type === "peer-unavailable") {
-          console.log("Retrying call...");
-          setTimeout(
-            () => attemptCall(peerId, joinedName, stream, retries - 1),
-            1000
-          ); // Retry after 1 second
-        }
-      });
+      if (meRef.current) {
+        meRef.current.off("error"); // Ensure no duplicate event listeners
+        meRef.current.on("error", (err) => {
+          console.error("Error while calling peer:", err);
+          if (err.type === "peer-unavailable" && retrying) {
+            console.log("Retrying call...");
+            setTimeout(
+              () => attemptCall(peerId, joinedName, stream, retries - 1),
+              1000
+            ); 
+          }
+        });
+      }
     }
 
     ws.on("user-joined", ({ peerId, userName }) => {
       console.log("User joined a room!", peerId);
-      attemptCall(peerId, userName, stream);
+      attemptCall(peerId, userName, stream, 3);
     });
 
     return () => {
       ws.off("user-joined");
+      retrying = false; 
+      if (meRef.current) {
+        meRef.current.off("error");
+      }
     };
   }, [meRef.current, stream, userName]);
 
@@ -394,7 +332,6 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <RoomContext.Provider
       value={{
-        // me,
         userName,
         setUserName,
         me: meRef.current,
