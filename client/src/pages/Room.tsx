@@ -40,30 +40,47 @@ const Room = () => {
   useEffect(() => {
     const checkPermissions = async () => {
       try {
-        const cameraPermission = await navigator.permissions.query({ name: 'camera' as PermissionName });
+        const cameraPermission = await navigator.permissions.query({
+          name: "camera" as PermissionName,
+        });
         console.log(`Camera permission: ${cameraPermission.state}`);
-  
-        const microphonePermission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+
+        const microphonePermission = await navigator.permissions.query({
+          name: "microphone" as PermissionName,
+        });
         console.log(`Microphone permission: ${microphonePermission.state}`);
-  
-        if (cameraPermission.state !== 'granted' || microphonePermission.state !== 'granted') {
-          console.log("Access to camera or microphone denied or not yet granted.");
+
+        if (
+          cameraPermission.state !== "granted" ||
+          microphonePermission.state !== "granted"
+        ) {
+          console.log(
+            "Access to camera or microphone denied or not yet granted."
+          );
           // Request camera and microphone access
           setOpen(true);
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
           setStream(stream);
           setOpen(false);
           return;
-        } 
+        } else {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
+          setStream(stream);
+        }
       } catch (err) {
         console.error("Error accessing media devices or permissions.", err);
-        setOpen(false); 
+        setOpen(false);
       }
     };
-  
-    checkPermissions(); 
+
+    checkPermissions();
   }, []);
-  
 
   useEffect(() => {
     if (userId && !emittedEvent.current) {
