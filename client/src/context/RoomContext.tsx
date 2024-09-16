@@ -255,16 +255,6 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         });
       }
     });
-
-    // Set up media stream
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        setStream(stream);
-      })
-      .catch((err) => {
-        console.error("Error accessing media devices.", err);
-      });
     ws.on("room-created", enterRoom);
     ws.on("user-disconnected", removePeer);
     ws.on("user-started-sharing", (peerId) => setScreenSharingId(peerId));
@@ -379,6 +369,7 @@ export const RoomProvider = ({ children }: { children: React.ReactNode }) => {
         me: meRef.current,
         peers,
         stream,
+        setStream,
         roomId,
         setRoomId,
         shareScreen,
