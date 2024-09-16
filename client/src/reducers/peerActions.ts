@@ -1,7 +1,6 @@
 export const ADD_PEER_STREAM = "ADD_PEER_STREAM" as const;
 export const ADD_PEER_NAME = "ADD_PEER_NAME" as const;
 export const REMOVE_PEER_STREAM = "REMOVE_PEER_STREAM" as const;
-export const ADD_ALL_PEERS = "ADD_ALL_PEERS" as const;
 
 export const addPeerStreamAction = (peerId: string, stream: MediaStream) => ({
   type: ADD_PEER_STREAM,

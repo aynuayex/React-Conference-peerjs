@@ -8,13 +8,20 @@ import ShareScreenButton from "../components/ShareScreenButton";
 import ChatButton from "../components/ChatButton";
 import Chat from "../components/chat/Chat";
 import NameInput from "../common/Name";
-// import { UserContext } from "../context/UserContext";
 import { ChatContext } from "../context/ChatContext";
+import HangButton from "@/components/HangButton";
+import MuteButton from "@/components/MuteButton";
+import VideoPauseButton from "@/components/VideoPauseButton";
 
 const Room = () => {
   const { id } = useParams();
   const emittedEvent = useRef(false);
   const {me,
+    hangUp,
+    isVideoEnabled,
+    isAudioEnabled,
+    toggleVideo,
+    toggleAudio,
     userName,
     stream,
     peers,
@@ -23,7 +30,6 @@ const Room = () => {
     setRoomId,
   } = useContext(RoomContext);
   const userId = me?.id;
-  // const { userName } = useContext(UserContext);
   const { chats, toggleChat } = useContext(ChatContext);
 
   useEffect(() => {
@@ -32,6 +38,9 @@ const Room = () => {
       emittedEvent.current = true;
     }
     // if(userId) ws.emit("join-room", { roomId: id, peerId: userId, userName });
+    return () => {
+      ws.off("join-room");
+    }
   }, [userId, id, userName]);
 
   useEffect(() => {
@@ -79,8 +88,11 @@ const Room = () => {
         )}
       </div>
       <div className="fixed bottom-0 p-6 w-full h-28 flex justify-center items-center space-x-2 border-t-2 bg-white">
+        <MuteButton isAudioEnabled={isAudioEnabled} onClick={toggleAudio} />
+        <VideoPauseButton isVideoEnabled={isVideoEnabled} onClick={toggleVideo} />
         <ShareScreenButton onClick={shareScreen} />
         <ChatButton onClick={toggleChat} />
+        <HangButton onClick={hangUp} />
       </div>
     </div>
   );

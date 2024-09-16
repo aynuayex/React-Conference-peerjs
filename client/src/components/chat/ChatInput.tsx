@@ -2,12 +2,10 @@ import { useContext, useState } from "react";
 import Button from "../commom/Button";
 import { ChatContext } from "../../context/ChatContext";
 import { RoomContext } from "../../context/RoomContext";
-// import { UserContext } from "../../context/UserContext";
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
   const { sendMessage } = useContext(ChatContext);
-  // const { userId } = useContext(UserContext);
   const { me, roomId } = useContext(RoomContext);
   const userId = me?.id;
 

@@ -1,8 +1,6 @@
-import { User } from "../type/user";
 import {
   ADD_PEER_NAME,
   ADD_PEER_STREAM,
-  ADD_ALL_PEERS,
   REMOVE_PEER_STREAM,
 } from "./peerActions";
 
@@ -23,12 +21,6 @@ type PeerAction =
   | {
       type: typeof REMOVE_PEER_STREAM;
       payload: { peerId: string };
-    }
-  | {
-      type: typeof ADD_ALL_PEERS;
-      payload: {
-        peers: Record<string, User>;
-      };
     };
 
 export const peersReducer = (state: PeerState, action: PeerAction) => {
@@ -48,12 +40,6 @@ export const peersReducer = (state: PeerState, action: PeerAction) => {
           ...state[action.payload.peerId],
           userName: action.payload.userName,
         },
-      };
-      // please revise here in detail because peers is { peerId, userName} , no stream
-    case ADD_ALL_PEERS:
-      return {
-        ...state,
-        ...action.payload.peers,
       };
     case REMOVE_PEER_STREAM:
       // const { [action.payload.peerId]: deleted, ...rest } = state;

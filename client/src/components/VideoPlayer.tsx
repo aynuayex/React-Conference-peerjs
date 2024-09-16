@@ -8,7 +8,7 @@ const VideoPlayer: React.FC<{stream?: MediaStream}> = ({stream}) => {
     }, [stream])
     
   return (
-    <video ref={videoRef} autoPlay muted />
+    <video ref={videoRef} autoPlay />
   )
 }
 

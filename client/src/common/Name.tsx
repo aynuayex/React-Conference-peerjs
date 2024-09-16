@@ -1,12 +1,10 @@
 import { useContext, useEffect } from "react";
-// import { UserContext } from "../context/UserContext";
 import { RoomContext } from "../context/RoomContext";
 import { ws } from "../ws";
 
 const NameInput = () => {
   const { me, roomId, userName, setUserName } = useContext(RoomContext);
   const userId = me?.id;
-  // const { userName, setUserName } = useContext(UserContext);
 
   useEffect(() => {
     sessionStorage.setItem("userName", userName);

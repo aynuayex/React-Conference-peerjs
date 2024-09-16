@@ -13,6 +13,7 @@ interface ChatValue {
   toggleChat: () => void;
   sendMessage: (message: string, roomId: string, author: string) => void;
 }
+
 export const ChatContext = createContext<ChatValue>({
   chats: { messages: [], isChatOpen: false },
   toggleChat: () => {},
@@ -57,6 +58,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const toggleChat = () => {
     chatDispatch(toggleChatAction(chats.isChatOpen));
   };
+  
   return (
     <ChatContext.Provider value={{ chats, toggleChat, sendMessage }}>
       {children}
