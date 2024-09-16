@@ -1,6 +1,5 @@
 import { Socket } from "socket.io";
 import { v4 as uuidV4 } from "uuid";
-// import { IMessage } from "../../../client/src/type/chat";
 
 const rooms: Record<string, Record<string, User>> = {};
 const chats: Record<string, IMessage[]> = {};
@@ -50,7 +49,6 @@ export const roomHandler = (socket: Socket) => {
     });
   };
 
-  // check
   const leaveRoom = ({ roomId, peerId }: RoomParams) => {
     // rooms[roomId] = rooms[roomId]?.filter((id) => id !== peerId);
 
@@ -82,10 +80,20 @@ export const roomHandler = (socket: Socket) => {
     }
   }
 
+  // const requestJoin = ({peerId, roomId}: RoomParams) => {
+  //   socket.to(roomId).emit("requested-to-join", peerId)
+  // }
+
   socket.on("create-room", createRoom);
   socket.on("join-room", joinRoom);
   socket.on("start-sharing", startSharing);
   socket.on("stop-sharing", stopSharing);
   socket.on("send-message", addMessage);
   socket.on("change-name", changeName);
+  // socket.on("ask-to-join", requestJoin);
+  // Handle the custom "user-left-room" event
+  socket.on("user-left-room", ({ roomId, peerId }: RoomParams) => {
+    console.log("User triggered leaving room:", roomId, peerId);
+    leaveRoom({ roomId, peerId });
+  });
 };

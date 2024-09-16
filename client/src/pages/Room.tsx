@@ -18,7 +18,7 @@ const Room = () => {
   const { id } = useParams();
   const emittedEvent = useRef(false);
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  // const [copied, setCopied] = useState(false);
   const {
     me,
     hangUp,
