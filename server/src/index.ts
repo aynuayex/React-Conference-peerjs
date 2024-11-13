@@ -5,7 +5,7 @@ import {Server} from "socket.io";
 // import cors, { CorsOptions }  from "cors";
 import { roomHandler } from "./room";
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 const app = express();
 
 // const whitelist = ["http://localhost:5173", "http://192.168.8.3:5173", "https://react-conference-peerjs.netlify.app"]
