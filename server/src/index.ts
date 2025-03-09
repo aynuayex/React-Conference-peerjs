@@ -1,7 +1,7 @@
-import 'dotenv/config';
-import express from "express";
-import http from 'http';
-import {Server} from "socket.io";
+import "dotenv/config";
+import express, { type Request, Response} from "express";
+import http from "http";
+import { Server } from "socket.io";
 // import cors, { CorsOptions }  from "cors";
 import { roomHandler } from "./room";
 
@@ -23,26 +23,28 @@ const app = express();
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: ["http://localhost:5173", "http://192.168.8.3:5173", "https://react-conference-peerjs.netlify.app"],
-        methods: ["GET", "POST"]
-    }
-})
+  cors: {
+    origin: [
+      "http://localhost:5173",
+      "http://192.168.8.3:5173",
+      "https://react-conference-peerjs.netlify.app",
+    ],
+    methods: ["GET", "POST"],
+  },
+});
 
 io.on("connection", (socket) => {
-    console.log("user is connected!")
+  console.log("user is connected!");
 
-    roomHandler(socket);
+  roomHandler(socket);
 
-    socket.on("disconnect", () => {
-        console.log("user is disconnected!");
-    })
-})
+  socket.on("disconnect", () => {
+    console.log("user is disconnected!");
+  });
+});
 
-app.get("/", (req, res) => {
-    res.send("hello world")
-})
+app.get("/", (_req: Request, res: Response) => {
+  res.send("hello world");
+});
 
-server.listen(port, () => console.log(`Server is running on port ${port}`))
-
-
+server.listen(port, () => console.log(`Server is running on port ${port}`));
