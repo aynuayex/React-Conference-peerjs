@@ -39,6 +39,10 @@ io.on("connection", (socket) => {
     })
 })
 
+app.get("/", (req, res) => {
+    res.send("hello world")
+})
+
 server.listen(port, () => console.log(`Server is running on port ${port}`))
 
 
